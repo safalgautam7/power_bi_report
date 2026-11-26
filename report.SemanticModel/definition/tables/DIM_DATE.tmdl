@@ -1,0 +1,306 @@
+table DIM_DATE
+	lineageTag: e0821c23-adc5-42b2-b9b1-94a41f65c71c
+	dataCategory: Time
+
+	measure Units = SUM(FCT_SALES[UNITS])
+		formatString: #,0
+		displayFolder: 01 Base Measures
+		lineageTag: 2c2eb36b-448e-47b9-9d25-d0407e20a9f4
+
+	column DATE_KEY
+		dataType: double
+		lineageTag: b190c7a8-6d14-48bb-94fd-dc5d4b5c04a9
+		summarizeBy: none
+		sourceColumn: DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CALENDAR_DATE
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: 06fbf587-def9-4857-8e74-e22e6153e2ff
+		summarizeBy: none
+		sourceColumn: CALENDAR_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CALENDAR_YEAR
+		dataType: double
+		lineageTag: f3f095c3-d54d-43e9-aed2-64491bd5e835
+		summarizeBy: none
+		sourceColumn: CALENDAR_YEAR
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column QUARTER_NUMBER
+		dataType: double
+		lineageTag: fb7de618-c94c-41bb-82cf-425c76cfdd47
+		summarizeBy: none
+		sourceColumn: QUARTER_NUMBER
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column QUARTER_KEY
+		dataType: double
+		lineageTag: 62d1c657-4f06-4432-925b-1b11dcf7cb33
+		summarizeBy: none
+		sourceColumn: QUARTER_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column QUARTER_LABEL
+		dataType: string
+		lineageTag: ca2a066e-41bc-4ca7-a035-b67c4627d978
+		summarizeBy: none
+		sourceColumn: QUARTER_LABEL
+		sortByColumn: QUARTER_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column QUARTER_START_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 085a8499-4471-41ac-9204-7ee2ced3e0de
+		summarizeBy: none
+		sourceColumn: QUARTER_START_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column QUARTER_END_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 370bee4c-0e0f-49f3-9c99-39af42bbc75b
+		summarizeBy: none
+		sourceColumn: QUARTER_END_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column MONTH_NUMBER
+		dataType: double
+		lineageTag: f989f155-d582-4d4c-b022-672f47c23d69
+		summarizeBy: none
+		sourceColumn: MONTH_NUMBER
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MONTH_NAME
+		dataType: string
+		lineageTag: 091bec07-b01d-42d5-adac-eed2c28ca74c
+		summarizeBy: none
+		sourceColumn: MONTH_NAME
+		sortByColumn: MONTH_NUMBER
+
+		annotation SummarizationSetBy = Automatic
+
+	column YEAR_MONTH_KEY
+		dataType: double
+		lineageTag: 25e543b3-8a93-4088-8652-2c3b97238a83
+		summarizeBy: none
+		sourceColumn: YEAR_MONTH_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column YEAR_MONTH_LABEL
+		dataType: string
+		lineageTag: 9cd3bef2-7340-4dae-a934-d8be05afc9ef
+		summarizeBy: none
+		sourceColumn: YEAR_MONTH_LABEL
+		sortByColumn: YEAR_MONTH_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column MONTH_START_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0b8f7b8e-620d-4cc0-ac91-78ea537432d0
+		summarizeBy: none
+		sourceColumn: MONTH_START_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column MONTH_END_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5ad14d23-a70a-422c-a5d5-0eaab0f6561f
+		summarizeBy: none
+		sourceColumn: MONTH_END_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DAY_OF_MONTH
+		dataType: double
+		lineageTag: 69c30210-091b-4789-8960-579313ddda54
+		summarizeBy: none
+		sourceColumn: DAY_OF_MONTH
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ISO_WEEK_YEAR
+		dataType: double
+		lineageTag: 80b88c6e-ff6d-4fa3-ac29-1a646444eb69
+		summarizeBy: none
+		sourceColumn: ISO_WEEK_YEAR
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ISO_WEEK_NUMBER
+		dataType: double
+		lineageTag: 6cba134f-7496-4232-88a3-ba6da5a24559
+		summarizeBy: none
+		sourceColumn: ISO_WEEK_NUMBER
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ISO_DAY_OF_WEEK
+		dataType: double
+		lineageTag: 0b84f0d3-6aba-4132-9288-eb23784c051b
+		summarizeBy: none
+		sourceColumn: ISO_DAY_OF_WEEK
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DAY_NAME
+		dataType: string
+		lineageTag: 2331733a-c9dc-4251-88e0-5c8cd98e499f
+		summarizeBy: none
+		sourceColumn: DAY_NAME
+		sortByColumn: ISO_DAY_OF_WEEK
+
+		annotation SummarizationSetBy = Automatic
+
+	column ISO_WEEK_KEY
+		dataType: double
+		lineageTag: f544982a-c6a3-4d0c-a480-f34741331270
+		summarizeBy: none
+		sourceColumn: ISO_WEEK_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ISO_WEEK_LABEL
+		dataType: string
+		lineageTag: 820094df-0bff-46d5-8624-ed2e415dedc1
+		summarizeBy: none
+		sourceColumn: ISO_WEEK_LABEL
+
+		annotation SummarizationSetBy = Automatic
+
+	column WEEK_START_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5ac468dc-4f0f-46bc-a9ea-eaf9f3e1e513
+		summarizeBy: none
+		sourceColumn: WEEK_START_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column WEEK_END_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: becc380d-8738-419c-8634-8f1b67b0f8c9
+		summarizeBy: none
+		sourceColumn: WEEK_END_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PY_COMPARABLE_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ba5c28f3-673b-4325-93eb-bbd00bc1b89c
+		summarizeBy: none
+		sourceColumn: PY_COMPARABLE_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PY_DATE_KEY
+		dataType: double
+		lineageTag: 68f09721-9712-4aca-aec4-d0c0764fc95f
+		summarizeBy: none
+		sourceColumn: PY_DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'ISO Year Week' = FORMAT(DIM_DATE[ISO_WEEK_YEAR], "0000") & "-W" & FORMAT(DIM_DATE[ISO_WEEK_NUMBER], "00")
+		dataType: string
+		lineageTag: db771159-f753-43aa-9a5b-d6e3712f5766
+		summarizeBy: none
+		sortByColumn: ISO_WEEK_KEY
+
+	column 'Template Month' = FORMAT(DIM_DATE[CALENDAR_DATE], "MMM yyyy")
+		dataType: string
+		lineageTag: c6550f4a-8b60-4285-9597-400b47862f9b
+		summarizeBy: none
+		sortByColumn: YEAR_MONTH_KEY
+
+	column 'Template Week' = "W" & FORMAT(DIM_DATE[ISO_WEEK_NUMBER], "00") & IF(DIM_DATE[ISO_WEEK_YEAR] <> DIM_DATE[CALENDAR_YEAR], " (" & FORMAT(DIM_DATE[ISO_WEEK_YEAR], "0000") & ")", "")
+		dataType: string
+		lineageTag: 2fa5a65b-abfb-49eb-b297-6b835943642f
+		summarizeBy: none
+		sortByColumn: 'Template Week Sort'
+
+	column 'Template Week Sort' = SWITCH(TRUE(), DIM_DATE[ISO_WEEK_YEAR] < DIM_DATE[CALENDAR_YEAR], 0, DIM_DATE[ISO_WEEK_YEAR] > DIM_DATE[CALENDAR_YEAR], 54, DIM_DATE[ISO_WEEK_NUMBER])
+		dataType: int64
+		isHidden
+		lineageTag: fb71dc5f-4fa6-45c2-a7ea-9990f24c1715
+		summarizeBy: none
+
+	/// Used only by the Running Total chart X axes.
+	column 'Running Day of Quarter' = DATEDIFF(DIM_DATE[QUARTER_START_DATE], DIM_DATE[CALENDAR_DATE], DAY) + 1
+		dataType: int64
+		isHidden
+		lineageTag: f8073463-ad78-4b70-a391-295fdca8ccb8
+		summarizeBy: none
+
+	partition DIM_DATE = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("FKINJZW-CD58116.snowflakecomputing.com","SNOWFLAKE_LEARNING_WH",[Implementation="2.0"]),
+				    RETAIL_DWH_Database = Source{[Name="RETAIL_DWH",Kind="Database"]}[Data],
+				    MART_SALES_Schema = RETAIL_DWH_Database{[Name="MART_SALES",Kind="Schema"]}[Data],
+				    DIM_DATE_View = MART_SALES_Schema{[Name="DIM_DATE",Kind="View"]}[Data]
+				in
+				    DIM_DATE_View
+
+	annotation PBI_ResultType = Table
+

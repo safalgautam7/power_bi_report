@@ -1,0 +1,36 @@
+# Imported model data and machine-specific Power BI state.
+**/.pbi/cache.abf
+**/.pbi/localSettings.json
+**/.pbi/unappliedChanges.json
+**/.pbi/daxQueries.json
+**/.pbi/tmdlscripts.json
+
+# Data-containing report packages and backups are transferred separately.
+*.pbix
+*.abf
+backups/
+private/
+**/report_backup_*/
+**/report_before_*/
+
+# Private presentation notes must never be committed.
+scripts.md
+**/scripts.md
+
+# Credentials and local environment configuration.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Operating-system and temporary files.
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+*.log
+~$*

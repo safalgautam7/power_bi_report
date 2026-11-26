@@ -1,0 +1,122 @@
+table DIM_LOCATION
+	lineageTag: 88f12a1f-ff77-45e0-a62f-3db879946338
+
+	column LOCATION_SK
+		dataType: double
+		lineageTag: ccd24086-5023-4979-8ad3-0f3dad220a9e
+		summarizeBy: none
+		sourceColumn: LOCATION_SK
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column LOCATION_ID
+		dataType: string
+		lineageTag: 6a90712b-f805-49d4-b2bd-543014ab4561
+		summarizeBy: none
+		sourceColumn: LOCATION_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LOCATION_NAME
+		dataType: string
+		lineageTag: 0801d40a-d923-4393-9c78-78eabdb5d5aa
+		summarizeBy: none
+		sourceColumn: LOCATION_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column CITY
+		dataType: string
+		lineageTag: 0d71cb24-3b2f-403e-8a65-00b5ae21983a
+		summarizeBy: none
+		sourceColumn: CITY
+
+		annotation SummarizationSetBy = Automatic
+
+	column REGION
+		dataType: string
+		lineageTag: f751d694-3023-4677-812b-6424396c4de7
+		summarizeBy: none
+		sourceColumn: REGION
+
+		annotation SummarizationSetBy = Automatic
+
+	column DISTRICT_ID
+		dataType: string
+		lineageTag: 4eec12b7-a9ed-4091-abe5-3d8667150d45
+		summarizeBy: none
+		sourceColumn: DISTRICT_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DISTRICT_NAME
+		dataType: string
+		lineageTag: 8843193c-d060-4b24-862c-cc17d69f54cd
+		summarizeBy: none
+		sourceColumn: DISTRICT_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column LOCATION_TYPE
+		dataType: string
+		lineageTag: 2353984f-0fc3-473d-ad34-b92f46de46a8
+		summarizeBy: none
+		sourceColumn: LOCATION_TYPE
+
+		annotation SummarizationSetBy = Automatic
+
+	column IS_ACTIVE
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2a945d01-bdd1-4026-aaac-2d6a41f81321
+		summarizeBy: none
+		sourceColumn: IS_ACTIVE
+
+		annotation SummarizationSetBy = Automatic
+
+	column EFFECTIVE_FROM
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 5b297161-2e42-465a-a2b6-5bc5fe531c93
+		summarizeBy: none
+		sourceColumn: EFFECTIVE_FROM
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column EFFECTIVE_TO
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: aa22e080-8b49-48f2-875e-56ec31e892af
+		summarizeBy: none
+		sourceColumn: EFFECTIVE_TO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column IS_CURRENT
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c2fe8fab-db12-438f-a4ac-8dfa9a1dcd88
+		summarizeBy: none
+		sourceColumn: IS_CURRENT
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_LOCATION = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("FKINJZW-CD58116.snowflakecomputing.com","SNOWFLAKE_LEARNING_WH",[Implementation="2.0"]),
+				    RETAIL_DWH_Database = Source{[Name="RETAIL_DWH",Kind="Database"]}[Data],
+				    MART_SALES_Schema = RETAIL_DWH_Database{[Name="MART_SALES",Kind="Schema"]}[Data],
+				    DIM_LOCATION_View = MART_SALES_Schema{[Name="DIM_LOCATION",Kind="View"]}[Data]
+				in
+				    DIM_LOCATION_View
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,214 @@
+table FCT_SALES
+	lineageTag: 6bf9a502-5906-43d3-9706-4190b10ac772
+
+	measure 'Net Sales' = SUM(FCT_SALES[GROSS_SALES_AMOUNT]) - SUM(FCT_SALES[DISCOUNT_AMOUNT])
+		formatString: #,0.00
+		displayFolder: 01 Base Measures
+		lineageTag: bc6b44be-9f55-4d42-9179-36ca634ce0d2
+
+	measure Transactioncount = DISTINCTCOUNT(FCT_SALES[TRANSACTION_ID])
+		formatString: #,0
+		displayFolder: 01 Base Measures
+		lineageTag: a413b4ec-ca5f-4625-b36c-df01fcabf161
+
+	measure 'Trading Metric' = [Net Sales]
+		formatString: #,0.00
+		displayFolder: 02 Reporting
+		lineageTag: c53374b8-fb2a-40a3-880b-b05d79adc629
+
+	measure 'YoY Status' =
+			VAR RunningColumn = SELECTEDVALUE('Running Columns'[Column])
+			VAR TemplateColumn = SELECTEDVALUE('Template Columns'[Column])
+			VAR Comparison = IF(TemplateColumn IN {"YoY", "YoY %"}, TemplateColumn, SWITCH(RunningColumn, "YoY Running Total", "YoY", "YoY % Running Total", "YoY %", SELECTEDVALUE('Time Comparison'[Comparison])))
+			VAR _Scope = IF(NOT ISBLANK(RunningColumn), "Quarter Running Total", SELECTEDVALUE('Period Scope'[Scope], "Selected QTD"))
+			VAR MetricName = SELECTEDVALUE('Metric'[Metric], "Net Sales")
+			VAR QStart = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+			VAR QEnd = SELECTEDVALUE('Quarter Selector'[Quarter End])
+			VAR Cutoff = MAX('Report Settings'[As Of Date])
+			VAR CellDates = VALUES(DIM_DATE[CALENDAR_DATE])
+			VAR PointDate = MAX(DIM_DATE[CALENDAR_DATE])
+			VAR WindowStart = IF(_Scope = "Previous 2 Quarters", EDATE(QStart, -6), QStart)
+			VAR WindowEnd = SWITCH(_Scope, "Previous 2 Quarters", QStart-1, "Quarter Running Total", MIN(PointDate, MIN(QEnd, Cutoff)), MIN(QEnd, Cutoff))
+			VAR DateRows = FILTER(ALL(DIM_DATE), DIM_DATE[CALENDAR_DATE] >= WindowStart && DIM_DATE[CALENDAR_DATE] <= WindowEnd
+			    && (_Scope = "Quarter Running Total" || CONTAINS(CellDates, DIM_DATE[CALENDAR_DATE], DIM_DATE[CALENDAR_DATE])))
+			VAR CurrentDates = SELECTCOLUMNS(DateRows, "Date", DIM_DATE[CALENDAR_DATE])
+			VAR PriorDates = SELECTCOLUMNS(FILTER(DateRows, NOT ISBLANK(DIM_DATE[PY_COMPARABLE_DATE])), "Date", DIM_DATE[PY_COMPARABLE_DATE])
+			VAR Covered = COUNTROWS(CurrentDates) > 0 && COUNTROWS(CurrentDates) = COUNTROWS(PriorDates)
+			    && MINX(PriorDates, [Date]) >= MAX('Report Settings'[Data Start Date])
+			    && MAXX(PriorDates, [Date]) <= MAX('Report Settings'[Data End Date])
+			VAR CY = CALCULATE(SWITCH(MetricName, "Net Sales", [Net Sales], "Units", [Units], "Transactioncount", [Transactioncount], "ABV", DIVIDE([Net Sales], [Transactioncount]), "UPT", DIVIDE([Units], [Transactioncount]), "Discount %", DIVIDE(SUM(FCT_SALES[DISCOUNT_AMOUNT]), SUM(FCT_SALES[GROSS_SALES_AMOUNT])), "Gross Sales", SUM(FCT_SALES[GROSS_SALES_AMOUNT]), "Discount", SUM(FCT_SALES[DISCOUNT_AMOUNT]), "ASP", DIVIDE([Net Sales], [Units]), "Active Locations", COUNTROWS(FILTER(VALUES(DIM_LOCATION[LOCATION_ID]),
+			    VAR Sales = CALCULATE([Net Sales])
+			    RETURN NOT ISBLANK(DIM_LOCATION[LOCATION_ID]) && NOT ISBLANK(Sales) && Sales <> 0)), "Sales per Location", DIVIDE([Net Sales], COUNTROWS(FILTER(VALUES(DIM_LOCATION[LOCATION_ID]),
+			    VAR Sales = CALCULATE([Net Sales])
+			    RETURN NOT ISBLANK(DIM_LOCATION[LOCATION_ID]) && NOT ISBLANK(Sales) && Sales <> 0))), BLANK()), REMOVEFILTERS(DIM_DATE), TREATAS(CurrentDates, DIM_DATE[CALENDAR_DATE]))
+			VAR PY = CALCULATE(SWITCH(MetricName, "Net Sales", [Net Sales], "Units", [Units], "Transactioncount", [Transactioncount], "ABV", DIVIDE([Net Sales], [Transactioncount]), "UPT", DIVIDE([Units], [Transactioncount]), "Discount %", DIVIDE(SUM(FCT_SALES[DISCOUNT_AMOUNT]), SUM(FCT_SALES[GROSS_SALES_AMOUNT])), "Gross Sales", SUM(FCT_SALES[GROSS_SALES_AMOUNT]), "Discount", SUM(FCT_SALES[DISCOUNT_AMOUNT]), "ASP", DIVIDE([Net Sales], [Units]), "Active Locations", COUNTROWS(FILTER(VALUES(DIM_LOCATION[LOCATION_ID]),
+			    VAR Sales = CALCULATE([Net Sales])
+			    RETURN NOT ISBLANK(DIM_LOCATION[LOCATION_ID]) && NOT ISBLANK(Sales) && Sales <> 0)), "Sales per Location", DIVIDE([Net Sales], COUNTROWS(FILTER(VALUES(DIM_LOCATION[LOCATION_ID]),
+			    VAR Sales = CALCULATE([Net Sales])
+			    RETURN NOT ISBLANK(DIM_LOCATION[LOCATION_ID]) && NOT ISBLANK(Sales) && Sales <> 0))), BLANK()), REMOVEFILTERS(DIM_DATE), TREATAS(PriorDates, DIM_DATE[CALENDAR_DATE]))
+			VAR Delta = CY-PY
+			VAR ChangeValue = IF(Covered && NOT(ISBLANK(CY) && ISBLANK(PY)) && Comparison IN {"YoY", "YoY %"}, IF(Comparison = "YoY %", DIVIDE(Delta, PY), Delta))
+			VAR Adverse = MetricName IN {"Discount", "Discount %"}
+			RETURN IF(ISBLANK(ChangeValue), "#303638", IF(ChangeValue = 0, "#6B7280", IF(IF(Adverse, -ChangeValue, ChangeValue) > 0, "#188038", "#C62828")))
+		formatString: General
+		displayFolder: 99 Formatting
+		lineageTag: 834b1b4f-7f94-4807-b279-7ee52cf666bb
+
+	column SALES_LINE_SK
+		dataType: double
+		lineageTag: bcf8472c-6c1e-4af5-a777-be462921ed30
+		summarizeBy: sum
+		sourceColumn: SALES_LINE_SK
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TRANSACTION_ID
+		dataType: string
+		lineageTag: c453c524-2001-4ea8-9704-fda8b6e8198f
+		summarizeBy: none
+		sourceColumn: TRANSACTION_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LINE_NUMBER
+		dataType: double
+		lineageTag: 2fec48ab-8ddd-48bc-b0a6-d6afec186416
+		summarizeBy: sum
+		sourceColumn: LINE_NUMBER
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TRANSACTION_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f982254a-5363-4535-9dcc-00b767d8bfa4
+		summarizeBy: none
+		sourceColumn: TRANSACTION_DATE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DATE_KEY
+		dataType: double
+		lineageTag: df7a8ae4-13b6-4bb8-ac67-1095e18f915e
+		summarizeBy: none
+		sourceColumn: DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ITEM_SK
+		dataType: double
+		lineageTag: 58dd35e9-badf-4dbb-b681-8c687789620c
+		summarizeBy: none
+		sourceColumn: ITEM_SK
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column LOCATION_SK
+		dataType: double
+		lineageTag: e80a5845-175e-427a-a404-367e503422eb
+		summarizeBy: none
+		sourceColumn: LOCATION_SK
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column LOCATION_ID
+		dataType: string
+		lineageTag: adb8506c-8eea-447e-bb15-cb51fc2ddb83
+		summarizeBy: none
+		sourceColumn: LOCATION_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column UNITS
+		dataType: double
+		lineageTag: 651d2f7a-338f-4c46-81e6-347573546a52
+		summarizeBy: sum
+		sourceColumn: UNITS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column UNIT_PRICE
+		dataType: double
+		lineageTag: 0a9eb915-42ef-4825-9e6d-1027e9cb8069
+		summarizeBy: sum
+		sourceColumn: UNIT_PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column GROSS_SALES_AMOUNT
+		dataType: double
+		lineageTag: 6004b699-38f3-4c30-bd23-c635d0feb22e
+		summarizeBy: sum
+		sourceColumn: GROSS_SALES_AMOUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DISCOUNT_AMOUNT
+		dataType: double
+		lineageTag: 0b498554-645a-413e-ab4f-81901e0468ea
+		summarizeBy: sum
+		sourceColumn: DISCOUNT_AMOUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column NET_SALES_AMOUNT
+		dataType: double
+		lineageTag: 21383580-348b-400a-b0d7-4f0647fec226
+		summarizeBy: sum
+		sourceColumn: NET_SALES_AMOUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column EXTENDED_PRICE_AMOUNT
+		dataType: double
+		lineageTag: b7b7b587-1cb4-4b0d-9635-85454a79178f
+		summarizeBy: sum
+		sourceColumn: EXTENDED_PRICE_AMOUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SOURCE_ROW_ID
+		dataType: string
+		lineageTag: 52dc55ef-41fe-421e-915f-41a5e8b800a6
+		summarizeBy: none
+		sourceColumn: SOURCE_ROW_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FCT_SALES = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("FKINJZW-CD58116.snowflakecomputing.com","SNOWFLAKE_LEARNING_WH",[Implementation="2.0"]),
+				    RETAIL_DWH_Database = Source{[Name="RETAIL_DWH",Kind="Database"]}[Data],
+				    MART_SALES_Schema = RETAIL_DWH_Database{[Name="MART_SALES",Kind="Schema"]}[Data],
+				    FCT_SALES_View = MART_SALES_Schema{[Name="FCT_SALES",Kind="View"]}[Data]
+				in
+				    FCT_SALES_View
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,156 @@
+table DIM_ITEM
+	lineageTag: 7f9e7532-ca09-48ec-a572-23ac14df2348
+
+	column ITEM_SK
+		dataType: double
+		lineageTag: eb0a9d21-0102-4b0f-9108-95e98bf3ee93
+		summarizeBy: none
+		sourceColumn: ITEM_SK
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ITEM_ID
+		dataType: string
+		lineageTag: 220922cc-96fe-4a9d-9ba5-4a5fcc407832
+		summarizeBy: none
+		sourceColumn: ITEM_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ITEM_NAME
+		dataType: string
+		lineageTag: aaee1c19-8a7f-4f71-aedb-980ca1ea957d
+		summarizeBy: none
+		sourceColumn: ITEM_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column BRAND
+		dataType: string
+		lineageTag: 0a5100e4-1714-41d0-8076-c8dc32ec1dc9
+		summarizeBy: none
+		sourceColumn: BRAND
+
+		annotation SummarizationSetBy = Automatic
+
+	column UNIT_OF_MEASURE
+		dataType: string
+		lineageTag: 3082610a-ad97-4c90-8c49-8c00254e120c
+		summarizeBy: none
+		sourceColumn: UNIT_OF_MEASURE
+
+		annotation SummarizationSetBy = Automatic
+
+	column DEPARTMENT_ID
+		dataType: string
+		lineageTag: 401d50df-4c3f-4aa5-ade8-c25aa5dae429
+		summarizeBy: none
+		sourceColumn: DEPARTMENT_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DEPARTMENT_NAME
+		dataType: string
+		lineageTag: a6d54931-7e91-44be-80a1-df87f326f30c
+		summarizeBy: none
+		sourceColumn: DEPARTMENT_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column CLASS_ID
+		dataType: string
+		lineageTag: 65cc5481-efa3-4720-8bce-dcaa6efc820f
+		summarizeBy: none
+		sourceColumn: CLASS_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CLASS_NAME
+		dataType: string
+		lineageTag: b27f1aca-2841-4aac-a676-29a88984007b
+		summarizeBy: none
+		sourceColumn: CLASS_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column SUBCLASS_ID
+		dataType: string
+		lineageTag: 0d15ee52-7628-4ca4-aa9e-395635df8e17
+		summarizeBy: none
+		sourceColumn: SUBCLASS_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column SUBCLASS_NAME
+		dataType: string
+		lineageTag: 8d732946-b4fb-4cca-a6bb-a05c76d0a05b
+		summarizeBy: none
+		sourceColumn: SUBCLASS_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column LIST_PRICE
+		dataType: double
+		lineageTag: 497c10e8-bbb5-4978-a284-7476a8a28cda
+		summarizeBy: none
+		sourceColumn: LIST_PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column IS_ACTIVE
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d37d96f9-43ab-4057-bc3a-d24883b5fcd1
+		summarizeBy: none
+		sourceColumn: IS_ACTIVE
+
+		annotation SummarizationSetBy = Automatic
+
+	column EFFECTIVE_FROM
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ec638f33-dd8e-42c0-935e-b6564a3803d1
+		summarizeBy: none
+		sourceColumn: EFFECTIVE_FROM
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column EFFECTIVE_TO
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6ab9b104-73ed-4088-934f-54de5d15d5cc
+		summarizeBy: none
+		sourceColumn: EFFECTIVE_TO
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column IS_CURRENT
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 8b6ccb21-5fad-425e-ac0d-e1f63bf5a8fe
+		summarizeBy: none
+		sourceColumn: IS_CURRENT
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_ITEM = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("FKINJZW-CD58116.snowflakecomputing.com","SNOWFLAKE_LEARNING_WH",[Implementation="2.0"]),
+				    RETAIL_DWH_Database = Source{[Name="RETAIL_DWH",Kind="Database"]}[Data],
+				    MART_SALES_Schema = RETAIL_DWH_Database{[Name="MART_SALES",Kind="Schema"]}[Data],
+				    DIM_ITEM_View = MART_SALES_Schema{[Name="DIM_ITEM",Kind="View"]}[Data]
+				in
+				    DIM_ITEM_View
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,102 @@
+table 'Running Layout'
+	lineageTag: 700e96f0-479f-4358-a1e7-fb4a2c7128d2
+
+	calculationGroup
+		precedence: 60
+
+		calculationItem 'CY Value' =
+				IF(ISSELECTEDMEASURE([Trading Metric], [YoY Status]),
+				    VAR _Point = SELECTEDVALUE('Running Dates'[Date])
+				    VAR _Start = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				    VAR _End = MIN(SELECTEDVALUE('Quarter Selector'[Quarter End]), MAX('Report Settings'[As Of Date]))
+				    RETURN IF(HASONEVALUE('Running Dates'[Date]) && _Point >= _Start && _Point <= _End,
+				        IF(ISSELECTEDMEASURE([YoY Status]), "#303638",
+				        CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS({_Point}, DIM_DATE[CALENDAR_DATE]),
+				            REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				            'Period Scope'[Scope] = "Selected QTD", 'Time Comparison'[Comparison] = "Current"))), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'CY Run Tot' =
+				IF(ISSELECTEDMEASURE([Trading Metric], [YoY Status]),
+				    VAR _Point = SELECTEDVALUE('Running Dates'[Date])
+				    VAR _Start = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				    VAR _End = MIN(SELECTEDVALUE('Quarter Selector'[Quarter End]), MAX('Report Settings'[As Of Date]))
+				    RETURN IF(HASONEVALUE('Running Dates'[Date]) && _Point >= _Start && _Point <= _End,
+				        IF(ISSELECTEDMEASURE([YoY Status]), "#303638",
+				        CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS({_Point}, DIM_DATE[CALENDAR_DATE]),
+				            REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				            'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "Current"))), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'PY Run Tot' =
+				IF(ISSELECTEDMEASURE([Trading Metric], [YoY Status]),
+				    VAR _Point = SELECTEDVALUE('Running Dates'[Date])
+				    VAR _Start = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				    VAR _End = MIN(SELECTEDVALUE('Quarter Selector'[Quarter End]), MAX('Report Settings'[As Of Date]))
+				    RETURN IF(HASONEVALUE('Running Dates'[Date]) && _Point >= _Start && _Point <= _End,
+				        IF(ISSELECTEDMEASURE([YoY Status]), "#303638",
+				        CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS({_Point}, DIM_DATE[CALENDAR_DATE]),
+				            REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				            'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "PY"))), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'YoY %' =
+				IF(ISSELECTEDMEASURE([Trading Metric], [YoY Status]),
+				    VAR _Point = SELECTEDVALUE('Running Dates'[Date])
+				    VAR _Start = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				    VAR _End = MIN(SELECTEDVALUE('Quarter Selector'[Quarter End]), MAX('Report Settings'[As Of Date]))
+				    RETURN IF(HASONEVALUE('Running Dates'[Date]) && _Point >= _Start && _Point <= _End,
+				        IF(ISSELECTEDMEASURE([YoY Status]), CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS({_Point}, DIM_DATE[CALENDAR_DATE]), 'Running Columns'[Column] = "YoY % Running Total"),
+				        CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS({_Point}, DIM_DATE[CALENDAR_DATE]),
+				            REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				            'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "YoY %"))), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "+0.0%;-0.0%;0.0%", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Current Year' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    VAR _Start = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				    VAR _Day = SELECTEDVALUE(DIM_DATE[Running Day of Quarter])
+				    VAR _Date = _Start + _Day - 1
+				    VAR _Value = IF(HASONEVALUE('Quarter Selector'[Quarter Key]) && NOT ISBLANK(_Day),
+				        CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE),
+				            TREATAS({_Date}, DIM_DATE[CALENDAR_DATE]),
+				            REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				            'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "Current"))
+				    RETURN DIVIDE(_Value, IF(SELECTEDVALUE('Metric'[Metric]) = "Units", 1000, 1000000)),
+				    SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Past Year' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    VAR _Start = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				    VAR _Day = SELECTEDVALUE(DIM_DATE[Running Day of Quarter])
+				    VAR _Date = _Start + _Day - 1
+				    VAR _Value = IF(HASONEVALUE('Quarter Selector'[Quarter Key]) && NOT ISBLANK(_Day),
+				        CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE),
+				            TREATAS({_Date}, DIM_DATE[CALENDAR_DATE]),
+				            REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				            'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "PY"))
+				    RETURN DIVIDE(_Value, IF(SELECTEDVALUE('Metric'[Metric]) = "Units", 1000, 1000000)),
+				    SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "0.00", SELECTEDMEASUREFORMATSTRING())
+
+	column Column
+		dataType: string
+		lineageTag: aa1d8f10-e95a-4c1c-82bd-470014c60a86
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 3c231689-78e4-48bd-8dea-5590d8f0ff59
+		summarizeBy: none
+		sourceColumn: Ordinal
+

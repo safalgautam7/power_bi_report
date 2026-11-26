@@ -1,0 +1,53 @@
+table 'Running Columns'
+	lineageTag: 09619ec4-cd79-4033-a745-d12bb6c16bb3
+
+	calculationGroup
+		precedence: 40
+
+		calculationItem 'CY Value' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				'Period Scope'[Scope] = "Selected QTD", 'Time Comparison'[Comparison] = "Current"), SELECTEDMEASURE())
+
+		calculationItem 'CY Running Total' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "Current"), SELECTEDMEASURE())
+
+		calculationItem 'PY Running Total' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "PY"), SELECTEDMEASURE())
+
+		calculationItem 'YoY Running Total' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "YoY"), SELECTEDMEASURE())
+
+			formatStringDefinition =
+					IF(NOT ISSELECTEDMEASURE([Trading Metric]), SELECTEDMEASUREFORMATSTRING(),
+					VAR M = SELECTEDVALUE('Metric'[Metric], "Net Sales")
+					RETURN SWITCH(TRUE(), M = "Discount %", "+0.0 ""pp"";-0.0 ""pp"";0.0 ""pp""",
+					M IN {"Units", "Transactioncount", "Active Locations"}, "+#,0;-#,0;0", "+#,0.00;-#,0.00;0.00"))
+
+		calculationItem 'YoY % Running Total' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Period Scope'), REMOVEFILTERS('Time Comparison'),
+				'Period Scope'[Scope] = "Quarter Running Total", 'Time Comparison'[Comparison] = "YoY %"), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "▲ +0.0%;▼ -0.0%;0.0%", SELECTEDMEASUREFORMATSTRING())
+
+	column Column
+		dataType: string
+		lineageTag: e23f620e-b55f-42f0-a0a2-906c70365904
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: f2748802-79d3-4556-8435-07c8fac58dea
+		summarizeBy: none
+		sourceColumn: Ordinal
+

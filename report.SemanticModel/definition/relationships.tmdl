@@ -1,0 +1,16 @@
+relationship AutoDetected_9fdbe871-d5c3-43b7-ad0e-a6b85a41b34b
+	fromColumn: FCT_SALES.DATE_KEY
+	toColumn: DIM_DATE.DATE_KEY
+
+relationship AutoDetected_76ec53d9-47bb-431a-8c52-d61412a227c9
+	fromColumn: FCT_SALES.ITEM_SK
+	toColumn: DIM_ITEM.ITEM_SK
+
+relationship AutoDetected_640b1995-a9a5-4be2-be63-27191d3fa82f
+	fromColumn: FCT_SALES.LOCATION_SK
+	toColumn: DIM_LOCATION.LOCATION_SK
+
+relationship RunningDateQuarterSelector
+	fromColumn: 'Running Dates'.'Quarter Key'
+	toColumn: 'Quarter Selector'.'Quarter Key'
+

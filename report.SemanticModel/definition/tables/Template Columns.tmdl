@@ -1,0 +1,130 @@
+table 'Template Columns'
+	lineageTag: 2c0a35a6-3cf4-40f7-af78-1fbe40bc8b5c
+
+	calculationGroup
+		precedence: 50
+
+		calculationItem 'Net Sales' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    IF(ISINSCOPE(DIM_DATE[QUARTER_LABEL]),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Metric'), REMOVEFILTERS('Time Comparison'),
+				    'Metric'[Metric] = "Net Sales", 'Time Comparison'[Comparison] = "Current")), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'PY Net Sales' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    IF(ISINSCOPE(DIM_DATE[QUARTER_LABEL]),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Metric'), REMOVEFILTERS('Time Comparison'),
+				    'Metric'[Metric] = "Net Sales", 'Time Comparison'[Comparison] = "PY")), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem YoY =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    IF(ISINSCOPE(DIM_DATE[QUARTER_LABEL]),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Metric'), REMOVEFILTERS('Time Comparison'),
+				    'Metric'[Metric] = "Net Sales", 'Time Comparison'[Comparison] = "YoY")), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0;-#,0;0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'YoY %' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    IF(ISINSCOPE(DIM_DATE[QUARTER_LABEL]),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Metric'), REMOVEFILTERS('Time Comparison'),
+				    'Metric'[Metric] = "Net Sales", 'Time Comparison'[Comparison] = "YoY %")), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "▲ +0.0%;▼ -0.0%;0.0%", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem Units =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    IF(ISINSCOPE(DIM_DATE[QUARTER_LABEL]),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Metric'), REMOVEFILTERS('Time Comparison'),
+				    'Metric'[Metric] = "Units", 'Time Comparison'[Comparison] = "Current")), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem Transaction_count =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    IF(ISINSCOPE(DIM_DATE[QUARTER_LABEL]),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Metric'), REMOVEFILTERS('Time Comparison'),
+				    'Metric'[Metric] = "Transactioncount", 'Time Comparison'[Comparison] = "Current")), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem ABV =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    IF(ISINSCOPE(DIM_DATE[QUARTER_LABEL]),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Metric'), REMOVEFILTERS('Time Comparison'),
+				    'Metric'[Metric] = "ABV", 'Time Comparison'[Comparison] = "Current")), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "0.0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Disc %' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    IF(ISINSCOPE(DIM_DATE[QUARTER_LABEL]),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS('Metric'), REMOVEFILTERS('Time Comparison'),
+				    'Metric'[Metric] = "Discount %", 'Time Comparison'[Comparison] = "Current")), SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "0.0%", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Quarter Header' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				VAR Q = SELECTEDVALUE('Quarter Selector'[Quarter])
+				VAR QStart = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				VAR QEnd = SELECTEDVALUE('Quarter Selector'[Quarter End])
+				RETURN IF(NOT ISBLANK(Q), "Quarter to date  |  Selected quarter: " & Q & "  |  " & FORMAT(QStart, "dd MMM yyyy") & " – " & FORMAT(QEnd, "dd MMM yyyy")),
+				SELECTEDMEASURE())
+
+		calculationItem 'KPI Change' = SELECTEDMEASURE()
+
+			formatStringDefinition =
+					IF(ISSELECTEDMEASURE([Trading Metric]),
+					IF(SELECTEDVALUE('Metric'[Metric]) = "Discount %",
+					    "▲ +0.0 ""pts YoY"";▼ -0.0 ""pts YoY"";0.0 ""pts YoY""",
+					    "▲ +0.0% ""YoY"";▼ -0.0% ""YoY"";0.0% ""YoY"""), SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Slicer Quarter' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    "Quarter: " & IF(ISFILTERED('Quarter Selector'[Quarter]),
+				    CONCATENATEX(FILTERS('Quarter Selector'[Quarter]), 'Quarter Selector'[Quarter], ", "), "All"), SELECTEDMEASURE())
+
+		calculationItem 'Slicer Department' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    "Department: " & IF(ISFILTERED('DIM_ITEM'[DEPARTMENT_NAME]),
+				    CONCATENATEX(FILTERS('DIM_ITEM'[DEPARTMENT_NAME]), 'DIM_ITEM'[DEPARTMENT_NAME], ", "), "All"), SELECTEDMEASURE())
+
+		calculationItem 'Slicer Class' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    "Class: " & IF(ISFILTERED('DIM_ITEM'[CLASS_NAME]),
+				    CONCATENATEX(FILTERS('DIM_ITEM'[CLASS_NAME]), 'DIM_ITEM'[CLASS_NAME], ", "), "All"), SELECTEDMEASURE())
+
+		calculationItem 'Slicer Region' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    "Region: " & IF(ISFILTERED('DIM_LOCATION'[REGION]),
+				    CONCATENATEX(FILTERS('DIM_LOCATION'[REGION]), 'DIM_LOCATION'[REGION], ", "), "All"), SELECTEDMEASURE())
+
+		calculationItem 'Slicer District' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    "District: " & IF(ISFILTERED('DIM_LOCATION'[DISTRICT_NAME]),
+				    CONCATENATEX(FILTERS('DIM_LOCATION'[DISTRICT_NAME]), 'DIM_LOCATION'[DISTRICT_NAME], ", "), "All"), SELECTEDMEASURE())
+
+		calculationItem 'Slicer Location Type' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				    "Location Type: " & IF(ISFILTERED('DIM_LOCATION'[LOCATION_TYPE]),
+				    CONCATENATEX(FILTERS('DIM_LOCATION'[LOCATION_TYPE]), 'DIM_LOCATION'[LOCATION_TYPE], ", "), "All"), SELECTEDMEASURE())
+
+	column Column
+		dataType: string
+		lineageTag: 0b9126a4-63db-43e9-a843-70a6f1d56382
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 504b8282-fc64-482b-aab5-af6c650ea648
+		summarizeBy: none
+		sourceColumn: Ordinal
+

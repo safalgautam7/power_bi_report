@@ -1,0 +1,68 @@
+table 'Quarter Selector'
+	lineageTag: fd2bf7e3-e104-4283-a824-60557defec73
+
+	column 'Quarter Key'
+		dataType: double
+		lineageTag: 9e6bb407-8031-4e03-a675-e65a597a2502
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter Key]
+
+	column Quarter
+		dataType: string
+		lineageTag: e8f3bb07-dabe-43cc-bc40-27be748d5d29
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter]
+		sortByColumn: 'Quarter Key'
+
+	column 'Quarter Start'
+		dataType: dateTime
+		formatString: dd MMM yyyy
+		lineageTag: 010ca3c8-c5da-4543-a48f-dd554e93a508
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter Start]
+
+	column 'Quarter End'
+		dataType: dateTime
+		formatString: dd MMM yyyy
+		lineageTag: e9cbe12a-d9a9-4892-b1be-33fd5cf99b9c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter End]
+
+	column 'Reporting Through'
+		dataType: dateTime
+		formatString: dd MMM yyyy
+		lineageTag: 669788fd-83cc-4722-b36f-e4c04854acb0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Reporting Through]
+
+	/// Used only for the Running Total chart reporting-cutoff marker.
+	column 'Running Cutoff Day' = DATEDIFF('Quarter Selector'[Quarter Start], 'Quarter Selector'[Reporting Through], DAY) + 1
+		dataType: int64
+		isHidden
+		lineageTag: 2983ad41-ab27-4296-b4b4-5540d4bf2260
+		summarizeBy: none
+
+	/// Used only to retain the full quarter on the Running Total X axes.
+	column 'Running Quarter Length' = DATEDIFF('Quarter Selector'[Quarter Start], 'Quarter Selector'[Quarter End], DAY) + 1
+		dataType: int64
+		isHidden
+		lineageTag: 94059e2f-d996-447f-bb40-155e99b04332
+		summarizeBy: none
+
+	partition 'Quarter Selector' = calculated
+		mode: import
+		source =
+				VAR _FirstDate = MAX('Report Settings'[Data Start Date])
+				VAR Cutoff = MAX('Report Settings'[As Of Date])
+				RETURN SELECTCOLUMNS(
+				    FILTER(SUMMARIZE(DIM_DATE, DIM_DATE[QUARTER_KEY], DIM_DATE[QUARTER_LABEL], DIM_DATE[QUARTER_START_DATE], DIM_DATE[QUARTER_END_DATE]),
+				        DIM_DATE[QUARTER_START_DATE] <= Cutoff && DIM_DATE[QUARTER_END_DATE] >= _FirstDate),
+				    "Quarter Key", DIM_DATE[QUARTER_KEY], "Quarter", DIM_DATE[QUARTER_LABEL],
+				    "Quarter Start", DIM_DATE[QUARTER_START_DATE], "Quarter End", DIM_DATE[QUARTER_END_DATE],
+				    "Reporting Through", MIN(DIM_DATE[QUARTER_END_DATE], Cutoff))
+

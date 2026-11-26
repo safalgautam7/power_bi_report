@@ -1,0 +1,34 @@
+table 'Report Settings'
+	lineageTag: 3081252d-11aa-4a61-bb49-dbed81cb8c77
+
+	column 'Data Start Date'
+		dataType: dateTime
+		formatString: dd MMM yyyy
+		lineageTag: 1095dae9-1cac-4c70-b32e-e27612e27c78
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Data Start Date]
+
+	column 'Data End Date'
+		dataType: dateTime
+		formatString: dd MMM yyyy
+		lineageTag: bebee3f4-9185-4042-aaba-3597e53449b1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Data End Date]
+
+	column 'As Of Date'
+		dataType: dateTime
+		formatString: dd MMM yyyy
+		lineageTag: 25134a01-6711-4238-a8da-bbe71c15626a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [As Of Date]
+
+	partition 'Report Settings' = calculated
+		mode: import
+		source =
+				VAR _FirstDate = MIN(FCT_SALES[TRANSACTION_DATE])
+				VAR _LastDate = MAX(FCT_SALES[TRANSACTION_DATE])
+				RETURN ROW("Data Start Date", _FirstDate, "Data End Date", _LastDate, "As Of Date", MIN(TODAY(), _LastDate))
+

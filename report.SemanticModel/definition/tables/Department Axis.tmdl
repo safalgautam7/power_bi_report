@@ -1,0 +1,24 @@
+table 'Department Axis'
+	lineageTag: fbc8dd62-de90-4e2a-aa93-1e97a433f01a
+
+	column 'Department ID'
+		dataType: string
+		lineageTag: a50d947a-c968-45b3-afd4-b5dde2d8cb94
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Department ID]
+
+	column Department
+		dataType: string
+		lineageTag: f7616098-f524-4f69-a04f-f8663ed85b32
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Department]
+
+	partition 'Department Axis' = calculated
+		mode: import
+		source =
+				UNION(SELECTCOLUMNS(SUMMARIZE(DIM_ITEM, DIM_ITEM[DEPARTMENT_ID], DIM_ITEM[DEPARTMENT_NAME]),
+				"Department ID", DIM_ITEM[DEPARTMENT_ID], "Department", DIM_ITEM[DEPARTMENT_NAME]),
+				ROW("Department ID", "__OTHER__", "Department", "Other"))
+

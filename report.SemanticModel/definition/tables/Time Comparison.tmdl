@@ -1,0 +1,75 @@
+table 'Time Comparison'
+	lineageTag: a473b5b4-f06d-4ba5-8ea0-41117696ff58
+
+	calculationGroup
+		precedence: 20
+
+		calculationItem Current = SELECTEDMEASURE()
+
+		calculationItem PY =
+				IF(NOT ISSELECTEDMEASURE([Trading Metric]), SELECTEDMEASURE(),
+				VAR MetricName = SELECTEDVALUE('Metric'[Metric], "Net Sales")
+				VAR CurrentOnly = LEFT(MetricName, 13) = "Like-for-Like" || MetricName IN {"Contribution %", "Top N Department Net Sales"}
+				VAR DatesCY = VALUES(DIM_DATE[CALENDAR_DATE])
+				VAR DatesPY = FILTER(VALUES(DIM_DATE[PY_COMPARABLE_DATE]), NOT ISBLANK(DIM_DATE[PY_COMPARABLE_DATE]))
+				VAR Covered = COUNTROWS(DatesCY) > 0 && COUNTROWS(DatesCY) = COUNTROWS(DatesPY)
+				    && MINX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) >= MAX('Report Settings'[Data Start Date])
+				    && MAXX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) <= MAX('Report Settings'[Data End Date])
+				VAR CY = SELECTEDMEASURE()
+				VAR PY = IF(Covered, CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS(DatesPY, DIM_DATE[CALENDAR_DATE])))
+				VAR IsRatio = MetricName IN {"ABV", "UPT", "ASP", "Discount %", "Sales per Location"}
+				VAR Delta = IF(IsRatio, IF(NOT ISBLANK(CY) && NOT ISBLANK(PY), CY-PY), COALESCE(CY, 0)-COALESCE(PY, 0))
+				RETURN IF(NOT CurrentOnly && Covered && NOT(ISBLANK(CY) && ISBLANK(PY)), IF(IsRatio, PY, COALESCE(PY, 0))))
+
+		calculationItem YoY =
+				IF(NOT ISSELECTEDMEASURE([Trading Metric]), SELECTEDMEASURE(),
+				VAR MetricName = SELECTEDVALUE('Metric'[Metric], "Net Sales")
+				VAR CurrentOnly = LEFT(MetricName, 13) = "Like-for-Like" || MetricName IN {"Contribution %", "Top N Department Net Sales"}
+				VAR DatesCY = VALUES(DIM_DATE[CALENDAR_DATE])
+				VAR DatesPY = FILTER(VALUES(DIM_DATE[PY_COMPARABLE_DATE]), NOT ISBLANK(DIM_DATE[PY_COMPARABLE_DATE]))
+				VAR Covered = COUNTROWS(DatesCY) > 0 && COUNTROWS(DatesCY) = COUNTROWS(DatesPY)
+				    && MINX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) >= MAX('Report Settings'[Data Start Date])
+				    && MAXX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) <= MAX('Report Settings'[Data End Date])
+				VAR CY = SELECTEDMEASURE()
+				VAR PY = IF(Covered, CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS(DatesPY, DIM_DATE[CALENDAR_DATE])))
+				VAR IsRatio = MetricName IN {"ABV", "UPT", "ASP", "Discount %", "Sales per Location"}
+				VAR Delta = IF(IsRatio, IF(NOT ISBLANK(CY) && NOT ISBLANK(PY), CY-PY), COALESCE(CY, 0)-COALESCE(PY, 0))
+				RETURN IF(NOT CurrentOnly && Covered && NOT(ISBLANK(CY) && ISBLANK(PY)), IF(MetricName = "Discount %", Delta*100, Delta)))
+
+			formatStringDefinition =
+					IF(NOT ISSELECTEDMEASURE([Trading Metric]), SELECTEDMEASUREFORMATSTRING(),
+					VAR M = SELECTEDVALUE('Metric'[Metric], "Net Sales")
+					RETURN SWITCH(TRUE(), M = "Discount %", "+0.0 ""pp"";-0.0 ""pp"";0.0 ""pp""",
+					M IN {"Units", "Transactioncount", "Active Locations"}, "+#,0;-#,0;0", "+#,0.00;-#,0.00;0.00"))
+
+		calculationItem 'YoY %' =
+				IF(NOT ISSELECTEDMEASURE([Trading Metric]), SELECTEDMEASURE(),
+				VAR MetricName = SELECTEDVALUE('Metric'[Metric], "Net Sales")
+				VAR CurrentOnly = LEFT(MetricName, 13) = "Like-for-Like" || MetricName IN {"Contribution %", "Top N Department Net Sales"}
+				VAR DatesCY = VALUES(DIM_DATE[CALENDAR_DATE])
+				VAR DatesPY = FILTER(VALUES(DIM_DATE[PY_COMPARABLE_DATE]), NOT ISBLANK(DIM_DATE[PY_COMPARABLE_DATE]))
+				VAR Covered = COUNTROWS(DatesCY) > 0 && COUNTROWS(DatesCY) = COUNTROWS(DatesPY)
+				    && MINX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) >= MAX('Report Settings'[Data Start Date])
+				    && MAXX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) <= MAX('Report Settings'[Data End Date])
+				VAR CY = SELECTEDMEASURE()
+				VAR PY = IF(Covered, CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS(DatesPY, DIM_DATE[CALENDAR_DATE])))
+				VAR IsRatio = MetricName IN {"ABV", "UPT", "ASP", "Discount %", "Sales per Location"}
+				VAR Delta = IF(IsRatio, IF(NOT ISBLANK(CY) && NOT ISBLANK(PY), CY-PY), COALESCE(CY, 0)-COALESCE(PY, 0))
+				RETURN IF(NOT CurrentOnly && Covered && NOT(ISBLANK(CY) && ISBLANK(PY)), DIVIDE(Delta, PY)))
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "▲ +0.0%;▼ -0.0%;0.0%", SELECTEDMEASUREFORMATSTRING())
+
+	column Comparison
+		dataType: string
+		lineageTag: 5d6833e5-a8f9-43e7-9135-2f06e0253be7
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 6fd8f488-06b4-4bfd-bfe8-e1c2234505c1
+		summarizeBy: none
+		sourceColumn: Ordinal
+

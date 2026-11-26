@@ -1,0 +1,52 @@
+table 'Period Scope'
+	lineageTag: 04698539-f363-4041-acea-7d080ad22d6d
+
+	calculationGroup
+		precedence: 30
+
+		calculationItem 'Selected QTD' =
+				IF(NOT ISSELECTEDMEASURE([Trading Metric]), SELECTEDMEASURE(),
+				VAR QStart = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				VAR QEnd = SELECTEDVALUE('Quarter Selector'[Quarter End])
+				VAR Cutoff = MAX('Report Settings'[As Of Date])
+				VAR WindowStart = QStart
+				VAR WindowEnd = MIN(QEnd, Cutoff)
+				VAR DatesInCell = FILTER(VALUES(DIM_DATE[CALENDAR_DATE]), DIM_DATE[CALENDAR_DATE] >= WindowStart && DIM_DATE[CALENDAR_DATE] <= WindowEnd)
+				RETURN IF(HASONEVALUE('Quarter Selector'[Quarter Key]) && COUNTROWS(DatesInCell) > 0,
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS(DatesInCell, DIM_DATE[CALENDAR_DATE]))))
+
+		calculationItem 'Previous 2 Quarters' =
+				IF(NOT ISSELECTEDMEASURE([Trading Metric]), SELECTEDMEASURE(),
+				VAR QStart = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				VAR QEnd = SELECTEDVALUE('Quarter Selector'[Quarter End])
+				VAR Cutoff = MAX('Report Settings'[As Of Date])
+				VAR WindowStart = EDATE(QStart, -6)
+				VAR WindowEnd = QStart - 1
+				VAR DatesInCell = FILTER(VALUES(DIM_DATE[CALENDAR_DATE]), DIM_DATE[CALENDAR_DATE] >= WindowStart && DIM_DATE[CALENDAR_DATE] <= WindowEnd)
+				RETURN IF(HASONEVALUE('Quarter Selector'[Quarter Key]) && COUNTROWS(DatesInCell) > 0,
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), TREATAS(DatesInCell, DIM_DATE[CALENDAR_DATE]))))
+
+		calculationItem 'Quarter Running Total' =
+				IF(NOT ISSELECTEDMEASURE([Trading Metric]), SELECTEDMEASURE(),
+				VAR QStart = SELECTEDVALUE('Quarter Selector'[Quarter Start])
+				VAR QEnd = SELECTEDVALUE('Quarter Selector'[Quarter End])
+				VAR Cutoff = MAX('Report Settings'[As Of Date])
+				VAR PointDate = MAX(DIM_DATE[CALENDAR_DATE])
+				VAR DatesToPoint = FILTER(ALL(DIM_DATE), DIM_DATE[CALENDAR_DATE] >= QStart && DIM_DATE[CALENDAR_DATE] <= PointDate)
+				RETURN IF(HASONEVALUE('Quarter Selector'[Quarter Key]) && PointDate >= QStart && PointDate <= MIN(QEnd, Cutoff),
+				    CALCULATE(SELECTEDMEASURE(), REMOVEFILTERS(DIM_DATE), DatesToPoint)))
+
+	column Scope
+		dataType: string
+		lineageTag: 2f8215fc-d91e-4a0b-a763-54bfc2f6bea0
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: e1281544-64a0-4302-8005-48dba240ca96
+		summarizeBy: none
+		sourceColumn: Ordinal
+

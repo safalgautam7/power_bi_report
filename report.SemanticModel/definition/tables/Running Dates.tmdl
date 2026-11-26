@@ -1,0 +1,21 @@
+table 'Running Dates'
+	lineageTag: 39e856c4-bfc8-4968-bbba-ce1f9350b542
+
+	column Date
+		dataType: dateTime
+		formatString: dd MMM
+		lineageTag: 78655873-3078-40bf-a7e1-162a5c4a27c1
+		summarizeBy: none
+		sourceColumn: [Date]
+
+	column 'Quarter Key'
+		dataType: double
+		isHidden
+		lineageTag: 0001b39e-7814-4b9e-b596-a9695a91c8b4
+		summarizeBy: none
+		sourceColumn: [Quarter Key]
+
+	partition 'Running Dates' = calculated
+		mode: import
+		source = SELECTCOLUMNS(DIM_DATE, "Date", DIM_DATE[CALENDAR_DATE], "Quarter Key", DIM_DATE[QUARTER_KEY])
+

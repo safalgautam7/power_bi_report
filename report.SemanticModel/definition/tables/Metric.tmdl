@@ -1,0 +1,157 @@
+table Metric
+	lineageTag: ce21eee7-dbbe-45d3-8ea0-a97955e28b16
+
+	calculationGroup
+		precedence: 10
+
+		calculationItem 'Net Sales' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				[Net Sales],
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem Units =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				[Units],
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem Transactioncount =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				[Transactioncount],
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem ABV =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				DIVIDE([Net Sales], [Transactioncount]),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem UPT =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				DIVIDE([Units], [Transactioncount]),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Discount %' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				DIVIDE(SUM(FCT_SALES[DISCOUNT_AMOUNT]), SUM(FCT_SALES[GROSS_SALES_AMOUNT])),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "0.0%", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Gross Sales' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				SUM(FCT_SALES[GROSS_SALES_AMOUNT]),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem Discount =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				SUM(FCT_SALES[DISCOUNT_AMOUNT]),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem ASP =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				DIVIDE([Net Sales], [Units]),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Active Locations' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				COUNTROWS(FILTER(VALUES(DIM_LOCATION[LOCATION_ID]),
+				    VAR Sales = CALCULATE([Net Sales])
+				    RETURN NOT ISBLANK(DIM_LOCATION[LOCATION_ID]) && NOT ISBLANK(Sales) && Sales <> 0)),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Sales per Location' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				DIVIDE([Net Sales], COUNTROWS(FILTER(VALUES(DIM_LOCATION[LOCATION_ID]),
+				    VAR Sales = CALCULATE([Net Sales])
+				    RETURN NOT ISBLANK(DIM_LOCATION[LOCATION_ID]) && NOT ISBLANK(Sales) && Sales <> 0))),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Contribution %' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				DIVIDE([Net Sales], CALCULATE([Net Sales], ALLSELECTED(DIM_ITEM[DEPARTMENT_NAME]))),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "0.0%", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Like-for-Like Net Sales' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				VAR DatesCY = VALUES(DIM_DATE[CALENDAR_DATE])
+				VAR DatesPY = FILTER(VALUES(DIM_DATE[PY_COMPARABLE_DATE]), NOT ISBLANK(DIM_DATE[PY_COMPARABLE_DATE]))
+				VAR Covered = COUNTROWS(DatesCY) = COUNTROWS(DatesPY) && COUNTROWS(DatesCY) > 0
+				    && MINX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) >= MAX('Report Settings'[Data Start Date])
+				    && MAXX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) <= MAX('Report Settings'[Data End Date])
+				VAR Candidates = VALUES(DIM_LOCATION[LOCATION_ID])
+				VAR StoresCY = FILTER(Candidates, CALCULATE([Transactioncount], REMOVEFILTERS(DIM_ITEM)) > 0)
+				VAR StoresPY = FILTER(Candidates, CALCULATE([Transactioncount], REMOVEFILTERS(DIM_ITEM), REMOVEFILTERS(DIM_DATE), TREATAS(DatesPY, DIM_DATE[CALENDAR_DATE])) > 0)
+				VAR Cohort = INTERSECT(StoresCY, StoresPY)
+				RETURN IF(Covered, CALCULATE([Net Sales], KEEPFILTERS(TREATAS(Cohort, DIM_LOCATION[LOCATION_ID])))),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Like-for-Like PY Net Sales' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				VAR DatesCY = VALUES(DIM_DATE[CALENDAR_DATE])
+				VAR DatesPY = FILTER(VALUES(DIM_DATE[PY_COMPARABLE_DATE]), NOT ISBLANK(DIM_DATE[PY_COMPARABLE_DATE]))
+				VAR Covered = COUNTROWS(DatesCY) = COUNTROWS(DatesPY) && COUNTROWS(DatesCY) > 0
+				    && MINX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) >= MAX('Report Settings'[Data Start Date])
+				    && MAXX(DatesPY, DIM_DATE[PY_COMPARABLE_DATE]) <= MAX('Report Settings'[Data End Date])
+				VAR Candidates = VALUES(DIM_LOCATION[LOCATION_ID])
+				VAR StoresCY = FILTER(Candidates, CALCULATE([Transactioncount], REMOVEFILTERS(DIM_ITEM)) > 0)
+				VAR StoresPY = FILTER(Candidates, CALCULATE([Transactioncount], REMOVEFILTERS(DIM_ITEM), REMOVEFILTERS(DIM_DATE), TREATAS(DatesPY, DIM_DATE[CALENDAR_DATE])) > 0)
+				VAR Cohort = INTERSECT(StoresCY, StoresPY)
+				RETURN IF(Covered, CALCULATE([Net Sales], REMOVEFILTERS(DIM_DATE), TREATAS(DatesPY, DIM_DATE[CALENDAR_DATE]), KEEPFILTERS(TREATAS(Cohort, DIM_LOCATION[LOCATION_ID])))),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+		calculationItem 'Top N Department Net Sales' =
+				IF(ISSELECTEDMEASURE([Trading Metric]),
+				VAR N = SELECTEDVALUE('Top N'[Value], 3)
+				VAR AxisID = SELECTEDVALUE('Department Axis'[Department ID])
+				VAR Scored = ADDCOLUMNS(ALLSELECTED(DIM_ITEM[DEPARTMENT_ID]), "__Sales", CALCULATE([Net Sales]))
+				VAR Eligible = FILTER(Scored, NOT ISBLANK([__Sales]))
+				VAR TopDepts = TOPN(N, Eligible, [__Sales], DESC, DIM_ITEM[DEPARTMENT_ID], ASC)
+				VAR TopIDs = SELECTCOLUMNS(TopDepts, "ID", DIM_ITEM[DEPARTMENT_ID])
+				VAR OtherIDs = EXCEPT(SELECTCOLUMNS(Eligible, "ID", DIM_ITEM[DEPARTMENT_ID]), TopIDs)
+				RETURN IF(NOT ISINSCOPE('Department Axis'[Department]), [Net Sales],
+				    IF(AxisID = "__OTHER__", CALCULATE([Net Sales], KEEPFILTERS(TREATAS(OtherIDs, DIM_ITEM[DEPARTMENT_ID]))),
+				        IF(CONTAINS(TopDepts, DIM_ITEM[DEPARTMENT_ID], AxisID),
+				            CALCULATE([Net Sales], KEEPFILTERS(TREATAS({AxisID}, DIM_ITEM[DEPARTMENT_ID])))))),
+				SELECTEDMEASURE())
+
+			formatStringDefinition = IF(ISSELECTEDMEASURE([Trading Metric]), "#,0.00", SELECTEDMEASUREFORMATSTRING())
+
+	column Metric
+		dataType: string
+		lineageTag: f224c7d8-8e72-4f04-910d-a390944c9ed2
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: 76aee517-2dc6-401c-88a7-631600462c13
+		summarizeBy: none
+		sourceColumn: Ordinal
+
